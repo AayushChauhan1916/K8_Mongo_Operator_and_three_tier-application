@@ -1,3 +1,4 @@
 resources:
   - namespaces/namespace.yaml
   - mongo-db-operator
+  - mongo-db-cluster
