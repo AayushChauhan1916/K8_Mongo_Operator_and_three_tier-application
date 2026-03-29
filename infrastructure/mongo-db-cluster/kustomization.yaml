@@ -1,2 +1,2 @@
 resources:
-  - mongodb.yaml
+  - mongo-db.yaml
