@@ -1,16 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: bootstrap
+  name: dev-cluster
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/AayushChauhan1916/K8_3_TIER_FULL_APP.git
-    targetRevision: HEAD
-    path: clusters
-    directory:
-      recurse: true
+    repoURL: https://github.com/AayushChauhan1916/K8_Mongo_Operator_and_three_tier-application.git
+    targetRevision: main
+    path: clusters/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
