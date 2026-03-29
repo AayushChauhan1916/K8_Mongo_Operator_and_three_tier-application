@@ -1,0 +1,14 @@
+replicaCount: 3
+
+image:
+  repository: mongo
+  tag: '6'
+
+service:
+  port: 27017
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+name: mongo-cluster-prod

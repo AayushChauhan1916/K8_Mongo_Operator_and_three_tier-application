@@ -1,0 +1,65 @@
+global:
+  name: nivashub-backend
+  environment: dev
+
+replicaCount: 2
+
+image:
+  repository: docker.io/ishan420/nest-backend
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 3000
+
+containerPort: 3000
+
+resources:
+  limits:
+    cpu: '500m'
+    memory: '512Mi'
+  requests:
+    cpu: '200m'
+    memory: '256Mi'
+
+env:
+  - name: NODE_ENV
+    value: 'development'
+
+  - name: PORT
+    value: '3000'
+
+env:
+  - name: MONGO_URI
+    value: "mongodb://nivashub_user:Aayush123@mongo-cluster-dev-svc.database:27017/nivashub?replicaSet=rs0&authSource=admin&retryWrites=true"
+
+  - name: JWT_SECRET
+    value: 'your_super_secret_key_here'
+
+  - name: JWT_EXPIRES_IN
+    value: '3000'
+
+  - name: JWT_REFRESH_SECRET
+    value: 'your_super_refresh_secret_key_here'
+
+  - name: JWT_REFRESH_EXPIRES_IN
+    value: '18000'
+
+  - name: GOOGLE_AUTH_CLIENT_ID
+    value: '850598628220-6b9h2p8t44at1t2n8monna4v96g4i5k7.apps.googleusercontent.com'
+
+  - name: GOOGLE_AUTH_CLIENT_SECRET
+    value: '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'
+
+  - name: GOOGLE_AUTH_REDIRECT_URL
+    value: 'http://localhost:5173/auth/google/callback'
+
+  - name: FRONTEND_URL
+    value: 'http://localhost:5173'
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70

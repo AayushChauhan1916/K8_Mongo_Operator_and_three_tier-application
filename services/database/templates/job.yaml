@@ -1,0 +1,122 @@
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: {{ include "db.name" . }}-rs-init
+#   namespace: {{ .Release.Namespace }}
+#   annotations:
+#     argocd.argoproj.io/hook: PostSync
+#     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+
+# spec:
+#   backoffLimit: 10
+
+#   template:
+#     spec:
+#       restartPolicy: OnFailure
+
+#       containers:
+#         - name: mongo-init
+#           image: mongo:7
+
+#           command:
+#             - /bin/sh
+#             - -c
+#             - |
+#               set -ex
+
+#               NAMESPACE="{{ .Release.Namespace }}"
+#               SERVICE="{{ include "db.serviceName" . }}"
+#               NAME="{{ include "db.name" . }}"
+#               PORT="{{ include "db.port" . }}"
+
+#               PRIMARY="$NAME-0.$SERVICE.$NAMESPACE:$PORT"
+
+#               echo "🚀 Waiting for ALL Mongo pods..."
+
+#               for i in $(seq 0 {{ sub .Values.replicaCount 1 }}); do
+#                 HOST="$NAME-$i.$SERVICE.$NAMESPACE:$PORT"
+
+#                 echo "⏳ Waiting for $HOST..."
+
+#                 until mongosh --host $HOST --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
+#                   sleep 3
+#                 done
+
+#                 echo "✅ $HOST is ready"
+#               done
+
+#               echo "🔍 Checking if replica set already initialized..."
+
+#               INIT_STATUS=$(mongosh --host $PRIMARY --quiet --eval "
+#                 try {
+#                   rs.status().ok
+#                 } catch (e) {
+#                   0
+#                 }
+#               ")
+
+#               if [ "$INIT_STATUS" != "1" ]; then
+#                 echo "⚙️ Initializing replica set..."
+
+#                 mongosh --host $PRIMARY --quiet --eval "
+#                   rs.initiate({
+#                     _id: 'rs0',
+#                     members: [
+#                       { _id: 0, host: '$PRIMARY' }
+#                     ]
+#                   })
+#                 "
+
+#                 echo "⏳ Waiting for primary election..."
+#                 sleep 5
+#               else
+#                 echo "✅ Replica set already initialized"
+#               fi
+
+#               echo "➕ Ensuring all members are added..."
+
+#               for i in $(seq 1 {{ sub .Values.replicaCount 1 }}); do
+#                 HOST="$NAME-$i.$SERVICE.$NAMESPACE:$PORT"
+
+#                 echo "🔍 Checking $HOST..."
+
+#                 EXISTS=$(mongosh --host $PRIMARY --quiet --eval "
+#                   try {
+#                     rs.status().members.some(m => m.name === '$HOST')
+#                   } catch (e) {
+#                     false
+#                   }
+#                 ")
+
+#                 if [ "$EXISTS" != "true" ]; then
+#                   echo "➕ Adding $HOST"
+
+#                   mongosh --host $PRIMARY --quiet --eval "
+#                     try {
+#                       rs.add('$HOST')
+#                     } catch (e) {
+#                       print(e)
+#                     }
+#                   "
+
+#                   sleep 2
+#                 else
+#                   echo "✅ $HOST already part of replica set"
+#                 fi
+#               done
+
+#               echo "⏳ Waiting for replica set to become healthy..."
+
+#               until mongosh --host $PRIMARY --quiet --eval "
+#                 try {
+#                   rs.status().members.filter(
+#                     m => m.stateStr === 'PRIMARY' || m.stateStr === 'SECONDARY'
+#                   ).length >= {{ .Values.replicaCount }}
+#                 } catch (e) {
+#                   false
+#                 }
+#               " | grep true; do
+#                 sleep 3
+#               done
+
+#               echo "🎉 Replica set fully configured and healthy!"

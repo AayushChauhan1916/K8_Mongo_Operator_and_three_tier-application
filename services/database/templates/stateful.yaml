@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "db.name" . }}
+spec:
+  serviceName: {{ include "db.serviceName" . }}
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: {{ include "db.name" . }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ include "db.name" . }}
+    spec:
+      containers:
+        - name: mongo
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+
+          command:
+            - mongod
+            - "--replSet"
+            - "rs0"
+            - "--bind_ip_all"
+            - "--auth"
+            - "--keyFile"
+            - "/etc/mongo-keyfile/keyfile"
+
+          ports:
+            - containerPort: {{ include "db.port" . }}
+
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+
+            - name: keyfile
+              mountPath: /etc/mongo-keyfile
+              readOnly: true
+
+      volumes:
+        - name: keyfile
+          secret:
+            secretName: mongo-keyfile
+            defaultMode: 0400
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}

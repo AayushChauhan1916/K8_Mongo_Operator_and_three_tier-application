@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: {{ .Values.global.name }}-service
+  labels:
+    app: {{ .Values.global.name }}
+    component: frontend
+    resource: service
+    env: {{ .Values.global.environment }}
+
+spec:
+  type: {{ .Values.service.type }}
+
+  selector:
+    app: {{ .Values.global.name }}
+
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.containerPort }}
