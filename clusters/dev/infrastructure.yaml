@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dev-mongodb-operator
+  name: dev-infrastructure
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "-2"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
     repoURL: https://github.com/AayushChauhan1916/K8_Mongo_Operator_and_three_tier-application.git
     targetRevision: main
-    path: clusters/dev/infrastructure/mongo-db-operator
+    path: infrastructure
   destination:
     server: https://kubernetes.default.svc
-    namespace: mongodb
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true
