@@ -1,6 +1,6 @@
 namePrefix: ""
 
 resources:
-  - ../crd
-  - ../rbac
-  - ../manager
+  - ./crd
+  - ./rbac
+  - ./manager
