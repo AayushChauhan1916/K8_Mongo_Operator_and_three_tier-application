@@ -47,10 +47,10 @@ env:
     value: '18000'
 
   - name: GOOGLE_AUTH_CLIENT_ID
-    value: '850598628220-6b9h2p8t44at1t2n8monna4v96g4i5k7.apps.googleusercontent.com'
+    value: 'Secret_HERE'
 
   - name: GOOGLE_AUTH_CLIENT_SECRET
-    value: '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'
+    value: 'Secret_HERE'
 
   - name: GOOGLE_AUTH_REDIRECT_URL
     value: 'http://localhost:5173/auth/google/callback'
