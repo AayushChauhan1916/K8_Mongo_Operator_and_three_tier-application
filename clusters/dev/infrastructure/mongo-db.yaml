@@ -1,18 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dev-cluster
+  name: dev-mongo-db
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
-  project: default
+  project: three-tier-infrastructure
   source:
     repoURL: https://github.com/AayushChauhan1916/K8_Mongo_Operator_and_three_tier-application.git
     targetRevision: main
-    path: clusters/dev
+    path: infrastructure/mongo-db-cluster
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: mongodb
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - SkipDryRunOnMissingResource=true

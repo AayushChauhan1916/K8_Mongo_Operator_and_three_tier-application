@@ -29,10 +29,8 @@ env:
 
   - name: PORT
     value: '3000'
-
-env:
   - name: MONGO_URI
-    value: "mongodb://nivashub_user:Aayush123@mongo-cluster-dev-svc.database:27017/nivashub?replicaSet=rs0&authSource=admin&retryWrites=true"
+    value: "mongodb://nivashub_user:Aayush123@mongodb-cluster-svc.mongodb:27017/nivashub?replicaSet=mongodb-cluster&authSource=admin&retryWrites=true&w=majority"
 
   - name: JWT_SECRET
     value: 'your_super_secret_key_here'

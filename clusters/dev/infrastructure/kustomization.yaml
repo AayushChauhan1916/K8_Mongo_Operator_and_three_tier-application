@@ -1,0 +1,4 @@
+resources:
+  - namespaces.yaml
+  - mongo-operator.yaml
+  - mongo-db.yaml

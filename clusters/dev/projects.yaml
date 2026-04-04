@@ -1,20 +1,39 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: AppProject
 metadata:
-  name: projects
+  name: three-tier-services
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: '0'
+    argocd.argoproj.io/sync-wave: "0"
 spec:
-  project: default
-  source:
-    repoURL: https://github.com/AayushChauhan1916/K8_Mongo_Operator_and_three_tier-application.git
-    targetRevision: main
-    path: projects
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: argocd
-  syncPolicy:
-    automated:
-      prune: false
-      selfHeal: true
+  description: Service applications for the three-tier stack.
+  sourceRepos:
+    - https://github.com/AayushChauhan1916/K8_Mongo_Operator_and_three_tier-application.git
+  destinations:
+    - namespace: nivashub
+      server: https://kubernetes.default.svc
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: three-tier-infrastructure
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  description: Foundational infrastructure for the three-tier stack.
+  sourceRepos:
+    - https://github.com/AayushChauhan1916/K8_Mongo_Operator_and_three_tier-application.git
+  destinations:
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+    - namespace: mongodb
+      server: https://kubernetes.default.svc
+    - namespace: database
+      server: https://kubernetes.default.svc
+    - namespace: nivashub
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

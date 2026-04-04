@@ -1,20 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: frontend
+  name: dev-frontend
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
 spec:
-  project: default
+  project: three-tier-services
   source:
     repoURL: https://github.com/AayushChauhan1916/K8_Mongo_Operator_and_three_tier-application.git
     targetRevision: main
     path: services/frontend
-    helm: 
-      values:
-       -- values-development.yaml
+    helm:
+      valueFiles:
+        - values-development.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: nivashub
   syncPolicy:
     automated:
       prune: true

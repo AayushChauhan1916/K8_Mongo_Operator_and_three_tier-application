@@ -21,6 +21,14 @@ spec:
         - name: root
           db: admin
       scramCredentialsSecretName: admin-scram
+    - name: nivashub_user
+      db: admin
+      passwordSecretRef:
+        name: mongodb-password
+      roles:
+        - name: readWrite
+          db: nivashub
+      scramCredentialsSecretName: nivashub-user-scram
 
   additionalMongodConfig:
     storage.wiredTiger.engineConfig.journalCompressor: zlib
